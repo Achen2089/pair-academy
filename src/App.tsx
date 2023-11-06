@@ -1,4 +1,3 @@
-import CodeEditor from './components/CodeEditor';
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import HomePage from './components/HomePage';
 import MainPage from './components/MainPage';
@@ -35,6 +34,7 @@ function App() {
 
 function Layout() {
   return <>
+  <h1 className="text-3xl font-bold underline text-center">Hello world!</h1>
     <NavBar />
     <Outlet />
     </>;
