@@ -1,45 +1,51 @@
 import React, { useEffect, useState } from "react";
 import CodeEditor from "./CodeEditor";
 import axios from "axios";
+
 import { classnames } from "../utils/general";
 import { languageOptions } from "../constants/languageOptions";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { defineTheme } from "../lib/defineTheme";
 // import useKeyPress from "../hooks/useKeyPress";
 import Footer from "./Footer";
 import OutputWindow from "./OutputWindow";
-import CustomInput from "./CustomInput";
 import OutputDetails from "./OutputDetails";
-import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
+import useKeyPress from "../hooks/useKeyPress";
 
-const pythonDefault = `# some comment`;
 
+const pythonDefault = `# Start Coding Here!`;
+interface LanguageType {
+  id: number;
+  name: string;
+  label: string;
+  value: string;
+}
 
 const MainPage: React.FC = () => {
   const [code, setCode] = useState(pythonDefault);
+  const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [language, setLanguage] = useState(languageOptions[0]);
 
-  // const enterPress = useKeyPress("Enter");
-  // const ctrlPress = useKeyPress("Control");
+  const enterPress = useKeyPress("Enter");
+  const ctrlPress = useKeyPress("Control");
 
-  const onSelectChange = (sl: string) => {
+  const onSelectChange = (sl: LanguageType) => {
     console.log("selected Option...", sl);
     setLanguage(sl);
   };
 
-  // useEffect(() => {
-  //   if (enterPress && ctrlPress) {
-  //     console.log("enterPress", enterPress);
-  //     console.log("ctrlPress", ctrlPress);
-  //     handleCompile();
-  //   }
-  // }, [ctrlPress, enterPress]);
+  useEffect(() => {
+    if (enterPress && ctrlPress) {
+      console.log("enterPress", enterPress);
+      console.log("ctrlPress", ctrlPress);
+      handleCompile();
+    }
+  }, [ctrlPress, enterPress]);
 
   const onChange = (action: string, data: string) => {
     switch (action) {
@@ -57,20 +63,22 @@ const MainPage: React.FC = () => {
     const formData = {
       language_id: language.id,
       source_code: btoa(code),
-      stdin: btoa(CustomInput),
+      stdin: btoa(customInput),
     };
+
     const options = {
       method: "POST",
-      url: process.env.REACT_APP_RAPID_API_URL,
+      url: import.meta.env.VITE_RAPID_API_URL,
       params: { base64_encoded: "true", fields: "*" },
       headers: {
         "content-type": "application/json",
         "Content-Type": "application/json",
-        "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
+        "X-RapidAPI-Host": import.meta.env.VITE_RAPID_API_HOST,
+        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
       },
       data: formData,
     }
+    console.log("options", options);
     axios
       .request(options)
       .then(function (response) {
@@ -86,15 +94,61 @@ const MainPage: React.FC = () => {
 
   };
 
-  const checkStatus = async (token) => {
-    // We will come to the implementation later in the code
+  const checkStatus = async (token: string) => {
+    const options = {
+      method: "GET",
+      url: import.meta.env.VITE_RAPID_API_URL + "/" + token,
+      params: { base64_encoded: "true", fields: "*" },
+      headers: {
+        "X-RapidAPI-Host": import.meta.env.VITE_RAPID_API_HOST,
+        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
+      },
+    };
+    try {
+      const response = await axios.request(options);
+      const statusId = response.data.status.id;
+
+      if (statusId === 1 || statusId === 2) {
+        setTimeout(() => {
+          checkStatus(token)
+        }, 2000)
+        return
+      } else {
+        setProcessing(false)
+        setOutputDetails(response.data)
+        showSuccessToast(`Compiled Successfully!`)
+        console.log('response.data', response.data)
+        return
+      }
+    } catch(err) {
+      console.log('err', err);
+      setProcessing(false);
+      showErrorToast();
+    }
   };
 
-  useEffect(() => {
-    defineTheme("oceanic-next").then((_) =>
-      setTheme({ value: "oceanic-next", label: "Oceanic Next" })
-    );
-  }, []);
+  const showSuccessToast = (msg : string) => {
+    toast.success(msg || `Compiled Successfully!`, {
+      position: "top-right",
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+  const showErrorToast = (msg?: string, timer?: number) => {
+    toast.error(msg || `Something went wrong! Please try again.`, {
+      position: "top-right",
+      autoClose: timer ? timer : 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   return (
     <>
