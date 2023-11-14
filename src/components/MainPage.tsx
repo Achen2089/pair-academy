@@ -8,8 +8,7 @@ import { languageOptions } from "../constants/languageOptions";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// import useKeyPress from "../hooks/useKeyPress";
-import Footer from "./Footer";
+import ChatWindow from "./ChatWindow";
 import OutputWindow from "./OutputWindow";
 import OutputDetails from "./OutputDetails";
 import LanguagesDropdown from "./LanguagesDropdown";
@@ -26,11 +25,9 @@ interface LanguageType {
 
 const MainPage: React.FC = () => {
   const [code, setCode] = useState(pythonDefault);
-  const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [language, setLanguage] = useState(languageOptions[0]);
-
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
 
@@ -63,7 +60,6 @@ const MainPage: React.FC = () => {
     const formData = {
       language_id: language.id,
       source_code: btoa(code),
-      stdin: btoa(customInput),
     };
 
     const options = {
@@ -170,6 +166,9 @@ const MainPage: React.FC = () => {
         </div>
       </div>
       <div className="flex flex-row space-x-4 items-start px-4 py-4">
+        <div> 
+          <ChatWindow />
+        </div>
         <div className="flex flex-col w-full h-full justify-start items-end">
             <CodeEditor
               code={code}
