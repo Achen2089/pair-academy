@@ -16,6 +16,8 @@ import useKeyPress from "../hooks/useKeyPress";
 
 
 const pythonDefault = `# Start Coding Here!`;
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+console.log('apiBaseUrl', apiBaseUrl);
 interface LanguageType {
   id: number;
   name: string;
@@ -61,22 +63,7 @@ const MainPage: React.FC = () => {
       language_id: language.id,
       source_code: btoa(code),
     };
-
-    const options = {
-      method: "POST",
-      url: import.meta.env.VITE_RAPID_API_URL,
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "content-type": "application/json",
-        "Content-Type": "application/json",
-        "X-RapidAPI-Host": import.meta.env.VITE_RAPID_API_HOST,
-        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
-      },
-      data: formData,
-    }
-    console.log("options", options);
-    axios
-      .request(options)
+    axios.post(`${apiBaseUrl}/compile`, formData)
       .then(function (response) {
         console.log("res.data", response.data);
         const token = response.data.token;
@@ -87,21 +74,11 @@ const MainPage: React.FC = () => {
         setProcessing(false);
         console.log(error);
       })
-
   };
 
   const checkStatus = async (token: string) => {
-    const options = {
-      method: "GET",
-      url: import.meta.env.VITE_RAPID_API_URL + "/" + token,
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "X-RapidAPI-Host": import.meta.env.VITE_RAPID_API_HOST,
-        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
-      },
-    };
     try {
-      const response = await axios.request(options);
+      const response = await axios.get(`${apiBaseUrl}/check-status/${token}`);
       const statusId = response.data.status.id;
 
       if (statusId === 1 || statusId === 2) {

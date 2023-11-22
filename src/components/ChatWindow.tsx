@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 
 export default function ChatWindow() {
@@ -10,6 +11,7 @@ export default function ChatWindow() {
   };
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    
     event.preventDefault();
     if (inputValue.trim() !== '') {
       setMessages([...messages, inputValue]);
@@ -18,11 +20,12 @@ export default function ChatWindow() {
     
   };
 
+
   return (
     <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
       <div className="md:flex">
         <div className="p-8">
-          <h1 className="text-2xl font-bold mb-4">ChatInteraction</h1>
+          <h1 className="text-2xl font-bold mb-4">Pair Programmer</h1>
           <ul className="space-y-2">
             {messages.map((message, index) => (
               <li key={index} className={`flex ${index % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
