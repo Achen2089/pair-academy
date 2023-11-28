@@ -59,14 +59,35 @@ app.get('/check-status/:token', async (req, res) => {
 
 // Pair Programming APIs
 
-app.post('/chat', async (req, res) => {
+const chatHistory = {};
 
+app.post('/chat', async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const userMessage = { role: "user", content: req.body.message };
+
+    if (!chatHistory[userId]) {
+      chatHistory[userId] = [];
+    }
+
+    chatHistory[userId].push(userMessage);
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: chatHistory[userId],
+    })
+    const botAnswer = response?.choices?.[0]?.message?.content;
+    chatHistory[userId].push({ role: "assistant", content: botAnswer });
+    res.send({ status: "Success", message: botAnswer });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-app.post('/load-lesson', async (req, res) => {
+// app.post('/load-lesson', async (req, res) => {
 
-}); 
-
+// }); 
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
