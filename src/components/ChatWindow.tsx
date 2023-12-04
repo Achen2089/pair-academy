@@ -36,6 +36,7 @@ export default function ChatWindow() {
       }
     } catch (error) {
       console.error("Error sending message to server", error)
+      setMessages(messages => [...messages, "Error sending message to server"]);
       setIsSending(false);
     }
   };
