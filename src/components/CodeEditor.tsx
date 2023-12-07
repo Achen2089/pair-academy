@@ -20,7 +20,7 @@ const CodeEditor: FC<CodeEditorProps> = ({onChange, language, code, theme}) => {
     return (
         <div className = "overlay rounded-md overflow-hidden w-full h-full shadow-4xl">
             <Editor
-                height="60vh"
+                height="65vh"
                 width={`100%`}
                 language={language || "python"}
                 value={value}

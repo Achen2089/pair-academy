@@ -32,6 +32,7 @@ interface LanguageType {
 const MainPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("lessons");
   const [code, setCode] = useState(pythonDefault);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [showOutput, setShowOutput] = useState(false);
@@ -143,7 +144,17 @@ const MainPage: React.FC = () => {
         draggable
         pauseOnHover
       />
-      <Split className="flex flex-row" sizes={[33, 67]} minSize={100} gutterSize={10}>
+      <Split 
+        className="flex flex-row" 
+        sizes={[33, 67]} 
+        minSize={100} 
+        gutterSize={5}
+        gutterStyle={(dimension) => ({
+          backgroundColor: '#ddd', // Light grey color
+          margin: '5px',
+          width: dimension === 'width' ? '10px' : undefined, // Set width only if the dimension is 'width'
+        })}
+      >
         <div className="flex flex-col">
             {/* Tab buttons */}
             <div className="bg-gray-100 p-2 flex space-x-1">
@@ -184,12 +195,12 @@ const MainPage: React.FC = () => {
             {/* Tab content */}
             <div className="border p-4">
               {activeTab === 'lessons' && <LessonWindow/>}
-              {activeTab === 'chat' && <ChatWindow />}
+              {activeTab === 'chat' && <ChatWindow messages={messages} setMessages={setMessages} />}
               {activeTab === 'help' && <HelpWindow />}
               {activeTab === 'diagram' && <DiagramWindow />}
             </div>
           </div>        
-        <div className="w-full">
+        <div className="w-full px-3">
           <div className="flex flex-row justify-between px-4 py-2">
             <LanguagesDropdown
               onSelectChange={onSelectChange}
@@ -204,8 +215,7 @@ const MainPage: React.FC = () => {
               {processing ? "Processing..." : "Compile and Execute"}
             </button>
           </div>
-          <Split className="flex-grow" direction="vertical" sizes={[66, 34]} minSize={50} gutterSize={10}>
-            <div>
+            <div className="">
               <CodeEditor
                 code={code}
                 onChange={onChange}
@@ -228,7 +238,6 @@ const MainPage: React.FC = () => {
             >
               {showOutput ? "Hide Output" : "Show Output"}
             </button>
-          </Split>
         </div>
       </Split>
     </>
