@@ -10,6 +10,9 @@ import Split from "react-split";
 import "react-toastify/dist/ReactToastify.css";
 
 import ChatWindow from "./ChatWindow";
+import LessonWindow from "./LessonWindow";
+import DiagramWindow from "./DiagramWindow";
+import HelpWindow from "./HelpWindow";
 import OutputWindow from "./OutputWindow";
 import OutputDetails from "./OutputDetails";
 import LanguagesDropdown from "./LanguagesDropdown";
@@ -27,9 +30,11 @@ interface LanguageType {
 }
 
 const MainPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState("lessons");
   const [code, setCode] = useState(pythonDefault);
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [showOutput, setShowOutput] = useState(false);
   const [language, setLanguage] = useState(languageOptions[0]);
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
@@ -59,6 +64,7 @@ const MainPage: React.FC = () => {
     }
   };
   const handleCompile = () => {
+    setShowOutput(true)
     setProcessing(true);
     const formData = {
       language_id: language.id,
@@ -138,19 +144,63 @@ const MainPage: React.FC = () => {
         pauseOnHover
       />
       <Split className="flex flex-row" sizes={[33, 67]} minSize={100} gutterSize={10}>
-        <div> 
-          <ChatWindow />
-        </div>
+        <div className="flex flex-col">
+            {/* Tab buttons */}
+            <div className="bg-gray-100 p-2 flex space-x-1">
+              <button
+                className={`flex-1 py-2 text-sm font-semibold rounded-t-lg ${
+                  activeTab === 'lessons' ? 'bg-white' : 'text-gray-500 bg-gray-200 hover:bg-white'
+                }`}
+                onClick={() => setActiveTab('lessons')}
+              >
+                Lessons
+              </button>
+              <button
+                className={`flex-1 py-2 text-sm font-semibold rounded-t-lg ${
+                  activeTab === 'chat' ? 'bg-white' : 'text-gray-500 bg-gray-200 hover:bg-white'
+                }`}
+                onClick={() => setActiveTab('chat')}
+              >
+                Chat
+              </button>
+              <button
+                className={`flex-1 py-2 text-sm font-semibold rounded-t-lg ${
+                  activeTab === 'diagram' ? 'bg-white' : 'text-gray-500 bg-gray-200 hover:bg-white'
+                }`}
+                onClick={() => setActiveTab('diagram')}
+              >
+                Diagram
+              </button>
+              <button
+                className={`flex-1 py-2 text-sm font-semibold rounded-t-lg ${
+                  activeTab === 'help' ? 'bg-white' : 'text-gray-500 bg-gray-200 hover:bg-white'
+                }`}
+                onClick={() => setActiveTab('help')}
+              >
+                Help
+              </button>
+            </div>
+
+            {/* Tab content */}
+            <div className="border p-4">
+              {activeTab === 'lessons' && <LessonWindow/>}
+              {activeTab === 'chat' && <ChatWindow />}
+              {activeTab === 'help' && <HelpWindow />}
+              {activeTab === 'diagram' && <DiagramWindow />}
+            </div>
+          </div>        
         <div className="w-full">
           <div className="flex flex-row justify-between px-4 py-2">
-            <LanguagesDropdown onSelectChange={onSelectChange} />
+            <LanguagesDropdown
+              onSelectChange={onSelectChange}
+            />
             <button
               onClick={handleCompile}
               disabled={!code}
-              className={classnames(
-                "border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white",
-                !code ? "opacity-50" : ""
-              )}>
+              className={`py-1 px-4 text-xs font-semibold rounded-lg ${
+                !code ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              } transition duration-150 ease-in-out disabled:opacity-50`}
+            >
               {processing ? "Processing..." : "Compile and Execute"}
             </button>
           </div>
@@ -163,10 +213,21 @@ const MainPage: React.FC = () => {
                 theme={'vs-dark'}
               />
             </div>
-            <div>
-              <OutputWindow outputDetails={outputDetails} />
-              {outputDetails && <OutputDetails outputDetails={outputDetails} />}
-            </div>
+            {showOutput && (
+              <div>
+                <OutputWindow outputDetails={outputDetails} />
+                {outputDetails && <OutputDetails outputDetails={outputDetails} />}
+              </div>
+            )}
+            <br/>
+            <button
+              onClick={() => setShowOutput(prev => !prev)}
+              className={`py-1 px-4 text-xs font-semibold rounded-lg ${
+                showOutput ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'
+              } transition duration-150 ease-in-out`}
+            >
+              {showOutput ? "Hide Output" : "Show Output"}
+            </button>
           </Split>
         </div>
       </Split>
