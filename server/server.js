@@ -73,7 +73,7 @@ app.post('/chat', async (req, res) => {
     chatHistory[userId].push(userMessage);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3",
       messages: chatHistory[userId],
     })
     const botAnswer = response?.choices?.[0]?.message?.content;
