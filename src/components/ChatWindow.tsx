@@ -1,17 +1,26 @@
 // ChatWindow.tsx
 import React, { useState, FormEvent, ChangeEvent } from 'react';
+import ReactDOMServer from 'react-dom/server';
 import axios from 'axios';
 import { marked } from 'marked';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism'; // You can choose any style you prefer
 import WordByWordMessage from './WordByWordMessage'; // Import the WordByWordMessage component
+
 
 type Message = {
   type: 'user' | 'tutor';
   content: string;
 };
 
-const ChatWindow: React.FC = () => {
+interface ChatWindowProps {
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+}
+
+
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, setMessages }) => {  
   const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL as string;
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const [isSending, setIsSending] = useState<boolean>(false);
 
@@ -45,26 +54,27 @@ const ChatWindow: React.FC = () => {
   const renderMarkdown = (content: string) => {
     const renderer = new marked.Renderer();
     renderer.code = (code, language) => {
-      return `<pre class="bg-gray-200 text-gray-700 p-3 rounded"><code>${code}</code></pre><div class="mb-4"></div>`;
+      const rawMarkup = SyntaxHighlighter({ language, children: code, style: nord });
+      return ReactDOMServer.renderToString(rawMarkup);
     };
-    return marked(content, { renderer });
+    return marked(content, { renderer, breaks: true });
   };
 
   const renderMessage = (message: Message, index: number) => {
-    const messageClasses = 'bg-white shadow p-4 rounded-lg';
+    const messageClasses = 'bg-white shadow p-4 rounded-lg w-full';
     const formattedContent = renderMarkdown(message.content);
 
     if (message.type === 'tutor') {
       return (
-        <div key={index} className={`my-2 max-w-lg w-full ${messageClasses}`}>
+        <div key={index} className={`my-2 w-full ${messageClasses}`}>
           <div className="font-semibold">{message.type.toUpperCase()}</div>
-          <WordByWordMessage htmlContent={formattedContent} delay={50} />
+          <WordByWordMessage htmlContent={formattedContent} delay={0} />
         </div>
       );
     }
 
     return (
-      <div key={index} className={`my-2 max-w-lg w-full ${messageClasses}`}>
+      <div key={index} className={`my-2  w-full ${messageClasses}`}>
         <div className="font-semibold">{message.type.toUpperCase()}</div>
         <span dangerouslySetInnerHTML={{ __html: formattedContent }} />
       </div>
