@@ -1,80 +1,102 @@
-import { useState } from 'react';
+// ChatWindow.tsx
+import React, { useState, FormEvent, ChangeEvent } from 'react';
 import axios from 'axios';
+import { marked } from 'marked';
+import WordByWordMessage from './WordByWordMessage'; // Import the WordByWordMessage component
 
+type Message = {
+  type: 'user' | 'tutor';
+  content: string;
+};
 
-export default function ChatWindow() {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const [messages, setMessages] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isSending, setIsSending] = useState(false);
+const ChatWindow: React.FC = () => {
+  const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL as string;
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isSending, setIsSending] = useState<boolean>(false);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
-  };
-
-  const displayResponseWordByWord = (responseMessage: string, index = 0, allWords : string[]) => {
-    if (index < allWords.length) {
-      setMessages(messages => {
-        const newMessages = [...messages];
-        newMessages[newMessages.length - 1] += (index === 0 ? "" : " ") + allWords[index];
-        return newMessages;
-    });
-      setTimeout(() => displayResponseWordByWord(responseMessage, index + 1, allWords), 50);
-    } 
-    else {
-      setIsSending(false);
-    }
   };
 
   const sendMessageToServer = async (userInput: string) => {
     setIsSending(true);
     try {
-      const response = await axios.post(`${apiBaseUrl}/chat`, {message : userInput});
+      const response = await axios.post<{ message: string }>(`${apiBaseUrl}/chat`, { message: userInput });
       if (response.data && response.data.message) {
-        setMessages(messages => [...messages, ""]);
-        displayResponseWordByWord(response.data.message, 0, response.data.message.split(' '));
+        setMessages(messages => [...messages, { type: 'tutor', content: response.data.message }]);
+        setIsSending(false);
       }
     } catch (error) {
-      console.error("Error sending message to server", error)
-      setMessages(messages => [...messages, "Error sending message to server"]);
+      console.error("Error sending message to server", error);
       setIsSending(false);
     }
   };
 
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (inputValue.trim() !== '' && !isSending) {
-      setMessages(messages => [...messages, inputValue]);
+      setMessages(messages => [...messages, { type: 'user', content: inputValue }]);
       sendMessageToServer(inputValue.trim());
       setInputValue('');
     }
-    
   };
 
+  const renderMarkdown = (content: string) => {
+    const renderer = new marked.Renderer();
+    renderer.code = (code, language) => {
+      return `<pre class="bg-gray-200 text-gray-700 p-3 rounded"><code>${code}</code></pre><div class="mb-4"></div>`;
+    };
+    return marked(content, { renderer });
+  };
+
+  const renderMessage = (message: Message, index: number) => {
+    const messageClasses = 'bg-white shadow p-4 rounded-lg';
+    const formattedContent = renderMarkdown(message.content);
+
+    if (message.type === 'tutor') {
+      return (
+        <div key={index} className={`my-2 max-w-lg w-full ${messageClasses}`}>
+          <div className="font-semibold">{message.type.toUpperCase()}</div>
+          <WordByWordMessage htmlContent={formattedContent} delay={50} />
+        </div>
+      );
+    }
+
+    return (
+      <div key={index} className={`my-2 max-w-lg w-full ${messageClasses}`}>
+        <div className="font-semibold">{message.type.toUpperCase()}</div>
+        <span dangerouslySetInnerHTML={{ __html: formattedContent }} />
+      </div>
+    );
+  };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-      <div className="md:flex">
-        <div className="p-8">
-          <h1 className="text-2xl font-bold mb-4">Pair Programmer</h1>
-          <ul className="space-y-2">
-            {messages.map((message, index) => (
-              <li key={index} className={`flex ${index % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
-                <div className={`rounded-lg p-2 ${index % 2 === 0 ? 'bg-green-200 ml-2' : 'bg-blue-200 mr-2'}`}>
-                  {message}
-                </div>
-              </li>
-            ))}
-          </ul>
-          <form onSubmit={handleFormSubmit} className="mt-4 flex">
-            <input type="text" value={inputValue} onChange={handleInputChange} className="border border-gray-400 p-2 rounded-lg w-full" />
-            <button type="submit" disabled={isSending} className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2">
-              {isSending ? '🧠 Thinking' : 'Send'}
-        </button>
-          </form>
-        </div>
+    <div className="flex flex-col w-full h-screen bg-gray-100">
+      <div className="flex-grow overflow-y-auto p-4 space-y-2">
+        {messages.map((message, index) => renderMessage(message, index))}
+      </div>
+      <div className="p-4 bg-white shadow-md sticky bottom-0">
+        <form onSubmit={handleFormSubmit} className="flex">
+          <input 
+            type="text" 
+            value={inputValue} 
+            onChange={handleInputChange}
+            className="flex-1 p-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSending}
+            placeholder="Type your message..."
+          />
+          <button 
+            type="submit" 
+            disabled={isSending}
+            className={`px-4 py-2 rounded-lg transition-colors duration-150 ${isSending ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+          >
+            {isSending ? '🧠 Thinking...' : 'Send'}
+          </button>
+        </form>
       </div>
     </div>
   );
-}
+};
+
+export default ChatWindow;
