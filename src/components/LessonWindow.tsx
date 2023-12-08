@@ -32,7 +32,7 @@ export default function LessonWindow() {
                     </div>
                     {openLessonIndex === lessonIndex && (
                         <ul className="bg-gray-100 p-4 rounded-b-md">
-                            {lesson.sublessons.map((sublesson, sublessonIndex) => (
+                            {lesson.lessons.map((sublesson, sublessonIndex) => (
                                 <li key={sublessonIndex} className="grid grid-cols-3 mb-2 items-center">
                                     <div className="col-span-2">
                                         <span className="font-medium">Sublesson {sublessonIndex + 1}: </span>
