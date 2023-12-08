@@ -1,93 +1,32 @@
 /* eslint-disable no-undef */
-import axios from "axios";
-import cors from "cors";
-import express from "express";
-import dotenv from "dotenv";
-import OpenAI from "openai"
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
+// Import Controllers
+import CompileController from './controllers/CompileController.js';
+import StatusController from './controllers/StatusController.js';
+import ChatController from './controllers/ChatController.js';
+
+// Initialize dotenv
 dotenv.config();
+
+// Initialize express app
 const app = express();
+
+// Middlewares
 app.use(express.json());
 app.use(cors());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // Code Compiliation APIs
 
-app.post('/compile', async (req, res) => {
-    try {
-        const response = await axios({
-          method: "POST",
-          url: process.env.RAPID_API_URL,
-          params: { base64_encoded: "true", fields: "*" },
-          headers: {
-            "content-type": "application/json",
-            "Content-Type": "application/json",
-            "X-RapidAPI-Host": process.env.RAPID_API_HOST,
-            "X-RapidAPI-Key": process.env.RAPID_API_KEY,
-          },
-          data: {
-            language_id: req.body.language_id,
-            source_code: req.body.source_code,
-          }
-        });
-        res.json(response.data);
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
-});
-
-app.get('/check-status/:token', async (req, res) => {
-    try {
-      const token = req.params.token;
-      const response = await axios({
-        method: "GET",
-        url: `${process.env.RAPID_API_URL}/${token}`,
-        params: { base64_encoded: "true", fields: "*" },
-        headers: {
-          "X-RapidAPI-Host": process.env.RAPID_API_HOST,
-          "X-RapidAPI-Key": process.env.RAPID_API_KEY,
-        }
-      });
-      res.json(response.data);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-});
+app.post('/compile', CompileController.compile);
+app.get('/check-status/:token', StatusController.checkStatus);
 
 // Pair Programming APIs
 
-const chatHistory = {};
-
-app.post('/chat', async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const userMessage = { role: "user", content: req.body.message };
-
-    if (!chatHistory[userId]) {
-      chatHistory[userId] = [];
-    }
-
-    chatHistory[userId].push(userMessage);
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-3",
-      messages: chatHistory[userId],
-    })
-    const botAnswer = response?.choices?.[0]?.message?.content;
-    chatHistory[userId].push({ role: "assistant", content: botAnswer });
-    res.send({ status: "Success", message: botAnswer });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// app.post('/load-lesson', async (req, res) => {
-
-// }); 
+app.post('/chat', ChatController.chat);
+app.post('/load-context', ChatController.loadContext);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

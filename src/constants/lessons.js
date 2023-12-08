@@ -1,7 +1,7 @@
 export const codingLessons = [
     {
         title: "Introduction to Programming Concepts",
-        sublessons: [
+        lessons: [
             {
                 title: "Hello World - Your First Program",
                 details: {
@@ -41,7 +41,7 @@ export const codingLessons = [
     },
     {
         title: "Understanding Programming Logic",
-        sublessons: [
+        lessons: [
             {
                 title: "Introduction to Control Structures",
                 details: {
@@ -81,7 +81,7 @@ export const codingLessons = [
     },
     {
         title: "Data Types and Structures",
-        sublessons: [
+        lessons: [
             {
                 title: "Primitive Data Types",
                 details: {
@@ -121,7 +121,7 @@ export const codingLessons = [
     },
     {
         title: "Functions and Modular Programming",
-        sublessons: [
+        lessons: [
             {
                 title: "Introduction to Functions",
                 details: {
@@ -161,7 +161,7 @@ export const codingLessons = [
     },
     {
         title: "Basic Input and Output",
-        sublessons: [
+        lessons: [
             {
                 title: "Console Input and Output",
                 details: {
@@ -201,7 +201,7 @@ export const codingLessons = [
     },
     {
         title: "Error Handling and Debugging",
-        sublessons: [
+        lessons: [
             {
                 title: "Understanding Errors",
                 details: {
@@ -241,7 +241,7 @@ export const codingLessons = [
     },
     {
         title: "Object-Oriented Programming Concepts",
-        sublessons: [
+        lessons: [
             {
                 title: "Classes and Objects",
                 details: {
