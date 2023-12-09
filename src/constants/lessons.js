@@ -14,17 +14,6 @@ export const codingLessons = [
                 }
             },
             {
-                title: "Understanding Programming Languages",
-                details: {
-                    description: "Learn about different programming languages and their purposes.",
-                    activities: [
-                        "Research and present the key features of a chosen programming language.",
-                        "Compare and contrast two different programming languages.",
-                        "Write a simple program in two different languages and compare the experience."
-                    ]
-                }
-            },
-            {
                 title: "Basics of a Programming Language",
                 details: {
                     description: "Understand the basic components and structure of a programming language.",
