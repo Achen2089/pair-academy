@@ -29,6 +29,11 @@ interface LanguageType {
   value: string;
 }
 
+type Message = {
+  type: 'user' | 'tutor';
+  content: string;
+};
+
 const MainPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("lessons");
   const [code, setCode] = useState(pythonDefault);
@@ -194,7 +199,7 @@ const MainPage: React.FC = () => {
 
             {/* Tab content */}
             <div className="border p-4">
-              {activeTab === 'lessons' && <LessonWindow/>}
+              {activeTab === 'lessons' && <LessonWindow messages = {messages} setMessages={setMessages} setActiveTab={setActiveTab} language = {language.name}/>}
               {activeTab === 'chat' && <ChatWindow messages={messages} setMessages={setMessages} />}
               {activeTab === 'help' && <HelpWindow />}
               {activeTab === 'diagram' && <DiagramWindow />}
