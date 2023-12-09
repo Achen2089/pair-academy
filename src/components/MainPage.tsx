@@ -3,7 +3,6 @@ import CodeEditor from "./CodeEditor";
 import axios from "axios";
 
 import { languageOptions } from "../constants/languageOptions";
-import { classnames } from "../utils/general";
 
 import { ToastContainer, toast } from "react-toastify";
 import Split from "react-split";
