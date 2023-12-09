@@ -31,7 +31,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, setMessages }) => {
   const sendMessageToServer = async (userInput: string) => {
     setIsSending(true);
     try {
-      const response = await axios.post<{ message: string }>(`${apiBaseUrl}/chat`, { message: userInput });
+      const response = await axios.post(`${apiBaseUrl}/chat`, { message: userInput });
       if (response.data && response.data.message) {
         setMessages(messages => [...messages, { type: 'tutor', content: response.data.message }]);
         setIsSending(false);
@@ -54,7 +54,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, setMessages }) => {
   const renderMarkdown = (content: string) => {
     const renderer = new marked.Renderer();
     renderer.code = (code, language) => {
-      const rawMarkup = SyntaxHighlighter({ language, children: code, style: nord });
+      const rawMarkup = new SyntaxHighlighter({ language, children: code, style: nord });
       return ReactDOMServer.renderToString(rawMarkup);
     };
     return marked(content, { renderer, breaks: true });
