@@ -8,7 +8,9 @@ function generateInitialMessage(lesson, language) {
     
     We have planned the following activities to enhance your learning:
     
-    ${lesson.details.activities.map((activity) => `* ${activity}`).join('\n')}
+    1. ${lesson.details.activities[0]}
+    2. ${lesson.details.activities[1]}
+    3. ${lesson.details.activities[2]}
     
     These activities are designed to give you practical experience and reinforce the concepts we'll cover.
     
