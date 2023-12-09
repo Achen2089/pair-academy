@@ -18,8 +18,6 @@ import OutputDetails from "./OutputDetails";
 import LanguagesDropdown from "./LanguagesDropdown";
 import useKeyPress from "../hooks/useKeyPress";
 
-
-const pythonDefault = `# Start Coding Here!`;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 console.log('apiBaseUrl', apiBaseUrl);
 interface LanguageType {
@@ -36,7 +34,7 @@ type Message = {
 
 const MainPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("lessons");
-  const [code, setCode] = useState(pythonDefault);
+  const [code, setCode] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
