@@ -39,15 +39,15 @@ const ChatHistoryController = {
 
   async loadContext(req, res) {
     try {
-      const { userId, lesson, programmingLanguage } = req.body;
-      const contextMessage = generateTutorPromptForlesson(lesson, programmingLanguage);
+      const { userId, lesson, language } = req.body;
+      const contextMessage = generateTutorPromptForlesson(lesson, language);
       
       console.log(contextMessage);
       const contextChatMessage = new ChatMessage(userId, contextMessage, 'system');
       chatHistory.setContext(userId, contextChatMessage);
 
       
-      const initalMessage = generateInitialMessage(lesson, programmingLanguage);
+      const initalMessage = generateInitialMessage(lesson, language);
       const initalChatMessage = new ChatMessage(userId, initalMessage, 'assistant');
       chatHistory.addMessage(userId, initalChatMessage);
 
