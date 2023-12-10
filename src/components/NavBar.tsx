@@ -9,8 +9,8 @@ export default function NavBar() {
       <h1 className="text-xl font-semibold cursor-pointer" onClick={() => setIsOpen(!isOpen)}>🟰</h1>
       {isOpen && (
         <div className="absolute bg-white shadow-md mt-2 py-2 w-40">
-          <Link to="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">Homepage</Link>
-          <Link to="/contact" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">Contact Form</Link>
+          <Link onClick={() => setIsOpen(false)} to="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">Homepage</Link>
+          <Link onClick={() => setIsOpen(false)} to="/contact" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">Contact Form</Link>
         </div>
       )}
     </div>
