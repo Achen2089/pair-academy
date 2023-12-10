@@ -13,14 +13,26 @@ type Message = {
   content: string;
 };
 
+interface OutputDetails {
+  status?: {
+    id?: number;
+    description?: string;
+  };
+  memory?: string;
+  time?: string;
+  compile_output?: string;
+  stdout?: string;
+  stderr?: string;
+}
 interface ChatWindowProps {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   code: string;
+  outputDetails: OutputDetails | null;
 }
 
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, setMessages }) => {  
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, setMessages, code, outputDetails }) => {  
   const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL as string;
   const [inputValue, setInputValue] = useState<string>('');
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -88,17 +100,37 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, setMessages }) => {
     );
   };
 
-  const handleCommandSelect = (command: string) => {
+  const handleCommandSelect = async (command: string) => {
     // Handle different commands here
     if (command === '/clear') {
       setMessages([]);
+      setInputValue('');
+      setShowDropdown(false);
     } else if (command === '/debug') {
-      // Implement debug functionality
+        setIsSending(true);
+        setInputValue('');
+        setShowDropdown(false);
+        if (outputDetails === null) {
+            setMessages(messages => [...messages, { type: 'tutor', content: "No output yet" }]);
+            setIsSending(false);
+        } else {
+          const response = await axios.post(`${apiBaseUrl}/chat`, { message: "Help me take a look at my output message and code" + atob(outputDetails.compile_output) + code });
+          if (response.data && response.data.message) {
+            setMessages(messages => [...messages, { type: 'tutor', content: response.data.message }]);
+            setIsSending(false);
+          }
+        }
     } else if (command === '/code') {
-      // Implement code functionality
+      setIsSending(true);
+      setInputValue('');
+      setShowDropdown(false);
+      const response = await axios.post(`${apiBaseUrl}/chat`, { message: "Help me take a look at my code" + code });
+      if (response.data && response.data.message) {
+        setMessages(messages => [...messages, { type: 'tutor', content: response.data.message }]);
+        setIsSending(false);
+      }
     }
-    setInputValue('');
-    setShowDropdown(false);
+    
   };
 
   useEffect(() => {
