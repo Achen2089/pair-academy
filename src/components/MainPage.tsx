@@ -197,9 +197,9 @@ const MainPage: React.FC = () => {
             {/* Tab content */}
             <div className="border p-4">
               {activeTab === 'lessons' && <LessonWindow messages = {messages} setMessages={setMessages} setActiveTab={setActiveTab} language = {language.name}/>}
-              {activeTab === 'chat' && <ChatWindow messages={messages} setMessages={setMessages} />}
+              {activeTab === 'chat' && <ChatWindow messages={messages} setMessages={setMessages} code={code} outputDetails={outputDetails}/>}
               {activeTab === 'help' && <HelpWindow />}
-              {activeTab === 'diagram' && <DiagramWindow />}
+              {activeTab === 'diagram' && <DiagramWindow/>}
             </div>
           </div>        
         <div className="w-full px-3">
@@ -225,10 +225,10 @@ const MainPage: React.FC = () => {
                 theme={'vs-dark'}
               />
             </div>
-            {showOutput && (
+            {showOutput && outputDetails !== null && (
               <div>
                 <OutputWindow outputDetails={outputDetails} />
-                {outputDetails && <OutputDetails outputDetails={outputDetails} />}
+                <OutputDetails outputDetails={outputDetails} />
               </div>
             )}
             <br/>
