@@ -56,6 +56,27 @@ const ChatHistoryController = {
       res.status(500).json({ message: error.message });
     }
   },
+
+  async debug(req, res) {
+    try {
+      const { userId, lesson, language } = req.body;
+      const contextMessage = generateTutorPromptForlesson(lesson, language);
+      
+      console.log(contextMessage);
+      const contextChatMessage = new ChatMessage(userId, contextMessage, 'system');
+      chatHistory.setContext(userId, contextChatMessage);
+
+      
+      const initalMessage = generateInitialMessage(lesson, language);
+      const initalChatMessage = new ChatMessage(userId, initalMessage, 'assistant');
+      chatHistory.addMessage(userId, initalChatMessage);
+
+      res.json({ status: "Success", message: initalChatMessage.content });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
 };
 
 export default ChatHistoryController;
