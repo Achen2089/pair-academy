@@ -6,7 +6,7 @@ I found pair programming an incredibly value experience when I was learning to c
 
 ## Demo
 
-To be added.
+[Video of a demo is here](https://www.loom.com/share/07d2063c2b8e41858f9641a223293487?sid=e0dd4533-466e-41cc-84fb-c994ebddc43d)
 
 ## How to Use
 
